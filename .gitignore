@@ -26,4 +26,5 @@ hs_err_pid*
 *.iml
 
 # build files
+target/
 target/*
