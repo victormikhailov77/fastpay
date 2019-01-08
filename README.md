@@ -49,6 +49,16 @@ git clone https://github.com/victormikhailov77/fastpay.git
 
 2) build
 
+on Windows, before run tests, set UTF-8 for source file encoding:
+
+set JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
+
+or on Linux-based systems
+
+export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8"
+
+on MAC OS X, it works as is.
+
 mvn clean install
 
 3) run unit tests
