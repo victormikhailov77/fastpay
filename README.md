@@ -62,10 +62,10 @@ java -jar target/moneyapp-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 application starts as standalone Jetty server, on port 4567
 
+Testing scenarios for REST API:
+
 to test REST API endpoints, one can use curl, Chrome browser plugin (Restlet), or Postman 
 
-
-REST API endpoints test
 
 1) Create transfer
 
@@ -90,6 +90,8 @@ expected result:
   }
 }
 
+
+
 2) Get transfer details by ID
 
 GET:  localhost:4567/transfer/id
@@ -112,6 +114,8 @@ expected result:
     "title": "przełew własny"
   }
 }
+
+
 
 3) Get all transfer details
 
@@ -164,6 +168,8 @@ To test, add more transfers, using POST API, examples are in resources/*.json
  ]
  
  
+ 
+ 
  4) Get filtered transfer details
  
     supported query parameters:
@@ -197,6 +203,9 @@ To test, add more transfers, using POST API, examples are in resources/*.json
     curl -H 'Content-Type: application/json' http://localhost:4567/transfer?status=PENDING
     
     expected: returned records with status = PENDING
+    
+    
+    
     
   5) Execute transfer:
   
@@ -245,6 +254,9 @@ To test, add more transfers, using POST API, examples are in resources/*.json
        "title": "przełew własny"
      }
    }
+   
+   
+   
    
    6) Cancel transfer:
    
