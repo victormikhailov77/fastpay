@@ -1,6 +1,27 @@
 # fastpay
 Money transfer application REST API
 
+Demo application, written in Java 8
+
+Prerequisites:
+Java 8 SDK (built on 1.8.0152)
+Maven 3.6 or 3.3
+
+Java libraries used:
+Spark microframework (not Apache Spark!) - REST api
+Gson - JSON processing
+Lombok - get rid of getters/setters hell in POJOs
+Guice - dependency injection
+Apache Commons - various utilities
+
+No Spring, Hibernate, or other heavy frameworks :-)  it starts instantly
+
+No real database.
+Application uses internal lightweight and superfast in-memory NoSQL data storage,
+with sorting and filtering support.
+Can be migrated to distributed key-value store or NoSQL database, like EHCache, Redis, Hazelcast, Cassandra
+
+
 How to build:
 
 1) download sources
