@@ -3,11 +3,13 @@ package org.fastpay;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Guice;
-import org.fastpay.app.GuiceModule;
+import org.fastpay.app.TestModule;
 import org.fastpay.common.TestBase;
 import org.fastpay.entity.ServiceResponse;
 import org.fastpay.entity.Transfer;
 import org.fastpay.entity.TransferStatus;
+import org.fastpay.service.AccountService;
+import org.fastpay.service.PaymentStatus;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -20,6 +22,10 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.stop;
 
@@ -33,9 +39,18 @@ public class ApplicationTest extends TestBase {
 
     @BeforeClass
     public static void startSpark() {
-        Guice.createInjector(new GuiceModule())
-                .getInstance(Application.class)
-                .run(DEFAULT_PORT);
+
+        AccountService account = mock(AccountService.class);
+        when(account.authorizePayment(anyString(), anyString(), anyObject(), anyString(), anyString())).thenReturn(PaymentStatus.AUTHORIZED);
+        when(account.cancelPayment(anyString())).thenReturn(PaymentStatus.CANCELLED);
+        when(account.finalizePayment(anyString())).thenReturn(PaymentStatus.COMPLETED);
+        when(account.deposit(anyString(), anyObject(), anyString(), anyString())).thenReturn(PaymentStatus.COMPLETED);
+
+        Application instance = Guice.createInjector(new TestModule(account))
+                .getInstance(Application.class);
+
+        instance.run(DEFAULT_PORT);
+
         awaitInitialization();
     }
 

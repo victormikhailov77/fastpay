@@ -94,7 +94,8 @@ public class TransferServiceImpl implements TransferService {
                         repository.update(txId, transfer);
                         return TransferStatus.COMPLETED;
                     } else {
-                        // still authorized
+                        // still authorized/pending
+                        return TransferStatus.PENDING;
                     }
 
                 }
