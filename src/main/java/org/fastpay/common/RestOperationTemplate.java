@@ -9,6 +9,7 @@ import spark.Request;
 import spark.Response;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.fastpay.common.QueryParameterValidator.*;
@@ -24,14 +25,14 @@ public class RestOperationTemplate {
         this.transferService = transferService;
     }
 
-    public String resourceUpdate(Request request, Response response, UpdateOperation operation,
+    public String resourceUpdate(Request request, Response response, Function<String, TransferStatus> operation,
                                  String errorMessage, String successMessage) {
         response.type(APPLICATION_TYPE_JSON);
         response.status(SC_OK);
 
         Transfer result = transferService.getTransferDetails(request.params(":id"));
         if (result != null) {
-            TransferStatus status = operation.execute(result.getId());
+            TransferStatus status = operation.apply(result.getId());
             if (status.equals(TransferStatus.ERROR)) {
                 response.status(SC_CONFLICT);
                 return new Gson().toJson(new ServiceResponse(TransferStatus.ERROR, errorMessage,
@@ -49,12 +50,12 @@ public class RestOperationTemplate {
         }
     }
 
-    public String resourceCreate(Request request, Response response, CreateOperation operation,
+    public String resourceCreate(Request request, Response response, Function<TransferDto, Transfer> operation,
                                  String successMessage, String failureMessage) {
         response.type(APPLICATION_TYPE_JSON);
         try {
             TransferDto transferData = new Gson().fromJson(request.body(), TransferDto.class);
-            Transfer newTransfer = operation.execute(transferData);
+            Transfer newTransfer = operation.apply(transferData);
             response.status(SC_CREATED);
             return new Gson()
                     .toJson(new ServiceResponse(newTransfer.getStatus(), successMessage,
@@ -68,7 +69,7 @@ public class RestOperationTemplate {
 
     }
 
-    public String resourceGetAll(Request request, Response response, GetAllOperation operation) {
+    public String resourceGetAll(Request request, Response response, Function<FilterParametersDto, List> operation) {
         response.type(APPLICATION_TYPE_JSON);
         response.status(SC_OK);
         try {
@@ -81,7 +82,7 @@ public class RestOperationTemplate {
             filterParams.setSource(request.queryParams("source"));
             filterParams.setTitle(request.queryParams("title"));
             filterParams.setAmount(getMoney(request.queryParams("amount")));
-            return new Gson().toJson(operation.execute(filterParams));
+            return new Gson().toJson(operation.apply(filterParams));
         } catch (ParameterValidationException ex) {
             LoggerFactory.getLogger(Application.class).error("Invalid parameter. " + ex.getMessage(), ex);
             response.status(SC_BAD_REQUEST);
@@ -90,12 +91,12 @@ public class RestOperationTemplate {
         }
     }
 
-    public String resourceGet(Request request, Response response, GetOperation operation,
+    public String resourceGet(Request request, Response response, Function<String, Transfer> operation,
                               String successMessage, String notFoundMessage) {
         response.type(APPLICATION_TYPE_JSON);
         response.status(SC_OK);
 
-        Transfer result = operation.execute(request.params(":id"));
+        Transfer result = operation.apply(request.params(":id"));
         if (result != null) {
             return new Gson().toJson(new ServiceResponse(result.getStatus(), successMessage,
                     new Gson().toJsonTree(result)));
@@ -109,26 +110,7 @@ public class RestOperationTemplate {
 
     public Object resourceCleanup(Runnable cleanup) {
         cleanup.run();
-        return null;
+        return null; // ignored, only to make compiler happy
     }
 
-    @FunctionalInterface
-    public interface UpdateOperation {
-        TransferStatus execute(String id);
-    }
-
-    @FunctionalInterface
-    public interface CreateOperation {
-        Transfer execute(TransferDto obj);
-    }
-
-    @FunctionalInterface
-    public interface GetAllOperation {
-        List<Transfer> execute(FilterParametersDto filterParams);
-    }
-
-    @FunctionalInterface
-    public interface GetOperation {
-        Transfer execute(String id);
-    }
 }

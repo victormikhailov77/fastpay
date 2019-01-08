@@ -51,29 +51,28 @@ public class TransferRepositoryImpl implements TransferRepository {
 
     @Override
     public List<Transfer> list(FilterParametersDto filterParams) {
-        TransferStatus statusVal = filterParams.getStatus();
-        String currencyVal = filterParams.getCurrency();
-        String sourceAccountVal = filterParams.getSource();
-        String destinationAccountVal = filterParams.getDestination();
-        String titleVal = filterParams.getTitle();
+        TransferStatus status = filterParams.getStatus();
+        String currency = filterParams.getCurrency();
+        String sourceAccount = filterParams.getSource();
+        String destinationAccount = filterParams.getDestination();
+        String title = filterParams.getTitle();
         String sortPropertyName = filterParams.getSort();
-        BigDecimal amountVal = filterParams.getAmount();
-        boolean orderDesc = filterParams.getOrder() != null && filterParams.getOrder().equals("desc") ? true : false;
-        Long limitVal = filterParams.getLimit();
+        BigDecimal amount = filterParams.getAmount();
+        Long limit = filterParams.getLimit();
+        boolean isReverseOrder = filterParams.getOrder() != null && filterParams.getOrder().equals("desc") ? true : false;
         Comparator<Transfer> comparator = getSortComparator(sortPropertyName);
+        Comparator<Transfer> orderedComparator = isReverseOrder ? comparator.reversed() : comparator;
 
         Stream<Transfer> stream = transferStore.values().stream()
-                .filter(item -> statusVal != null ? item.getStatus().equals(statusVal) : true)
-                .filter(item -> currencyVal != null ? item.getCurrency().equals(currencyVal) : true)
-                .filter(item -> sourceAccountVal != null ? item.getSource().equals(sourceAccountVal) : true)
-                .filter(item -> destinationAccountVal != null ? item.getDestination().equals(destinationAccountVal) : true)
-                .filter(item -> titleVal != null ? item.getTitle().equals(titleVal) : true)
-                .filter(item -> amountVal != null ? item.getAmount().equals(amountVal) : true)
-                .sorted(sortPropertyName != null ?
-                        (orderDesc ? comparator.reversed() :
-                                comparator) :
+                .filter(item -> status != null ? item.getStatus().equals(status) : true)
+                .filter(item -> currency != null ? item.getCurrency().equals(currency) : true)
+                .filter(item -> sourceAccount != null ? item.getSource().equals(sourceAccount) : true)
+                .filter(item -> destinationAccount != null ? item.getDestination().equals(destinationAccount) : true)
+                .filter(item -> title != null ? item.getTitle().equals(title) : true)
+                .filter(item -> amount != null ? item.getAmount().equals(amount) : true)
+                .sorted(sortPropertyName != null ? orderedComparator :
                         Comparator.comparing(Transfer::getTimestamp))
-                .limit(limitVal != null ? limitVal : transferStore.values().size());
+                .limit(limit != null ? limit : transferStore.values().size());
 
         return stream.collect(Collectors.toList());
     }

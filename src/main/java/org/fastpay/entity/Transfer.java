@@ -1,11 +1,13 @@
 package org.fastpay.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class Transfer extends TransferDto {
 
     private String id;

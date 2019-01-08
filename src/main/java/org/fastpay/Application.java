@@ -3,8 +3,8 @@ package org.fastpay;
 import com.google.inject.Guice;
 import org.fastpay.app.GuiceModule;
 import org.fastpay.common.LogHelper;
-import org.fastpay.service.TransferService;
 import org.fastpay.common.RestOperationTemplate;
+import org.fastpay.service.TransferService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +73,7 @@ public class Application {
         );
 
         // cleanup database
+        // maintenance function, should be not available for users
         delete(RESOURCE_URI_CLEANUP, (request, response) ->
             restTemplate.resourceCleanup(transferService::cleanup)
         );
