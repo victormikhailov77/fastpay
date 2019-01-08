@@ -1,5 +1,5 @@
 # fastpay
-Money transfer application REST API
+Money transfer REST API
 
 Demo application, written in Java 8
 
@@ -13,6 +13,7 @@ Gson - JSON processing
 Lombok - get rid of getters/setters hell in POJOs
 Guice - dependency injection
 Apache Commons - various utilities
+Mockito - unit tests
 
 No Spring, Hibernate, or other heavy frameworks :-)  it starts instantly
 
@@ -21,6 +22,23 @@ Application uses internal lightweight and superfast in-memory NoSQL data storage
 with sorting and filtering support.
 Can be migrated to distributed key-value store or NoSQL database, like EHCache, Redis, Hazelcast, Cassandra
 
+Limitations of functionality:
+
+Due to lack of business requirements, application design and business logic do not cover real-life scenarios.
+
+Sender and receiver identified by bank account numbers, which unique identify physical person or company. 
+For simplicity, objects used in API don't have name, address data, other properties, etc - only account number used as primary identifier. 
+
+-No multi-currency operation. Should be currency conversion, in cases:
+  -currency of transfer different from currency of sender's account
+  -currency of transfer dofferent from currency of recipient's account
+  currency rates can be obtained from some web service (OpenExchange API, CurrencyLayer API)
+  
+-No commission calculation. Can be a per-transaction commission, based on bank location: 
+ex: sender and recipient in the same bank - zero commission
+    sender and recipient in different banks, same country - 1%
+    sender and recipient both in EU economical zone - 2,5%
+    sender and recipient in arbitrary countries without special agreements - 4%
 
 How to build:
 
