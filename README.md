@@ -26,13 +26,13 @@ Limitations of functionality:
 
 Due to lack of business requirements, application design and business logic do not cover real-life scenarios.
 
-Sender and receiver identified by bank account numbers, which unique identify physical person or company. 
+Sender and receiver identified by bank account numbers (IBAN), which unique identify physical person or company. 
 For simplicity, objects used in API don't have name, address data, other properties, etc - only account number used as primary identifier. 
 
 -No multi-currency operation. Should be currency conversion, in cases:
   -currency of transfer different from currency of sender's account
   -currency of transfer dofferent from currency of recipient's account
-  currency rates can be obtained from some web service (OpenExchange API, CurrencyLayer API)
+  currency rates can be obtained from publicly available REST web service (ex: OpenExchange API, CurrencyLayer API)
   
 -No commission calculation. Can be a per-transaction commission, based on bank location: 
 ex: sender and recipient in the same bank - zero commission
