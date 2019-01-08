@@ -23,7 +23,7 @@ public class MethodGetWrapper<T> implements Comparable {
         try {
             return (T)method.invoke(instance);
         } catch (IllegalAccessException | InvocationTargetException ex) {
-            throw new ParameterValidationException("Invalid parameter name.", ex);
+            throw new IllegalArgumentException("Invalid parameter name.", ex);
         }
     }
 

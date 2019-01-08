@@ -10,9 +10,23 @@ import java.util.Map;
 // in real life scenario, should be wrapper around bank API
 public class AccountServiceImpl implements AccountService {
 
-    Map<String, BigDecimal> accountStorage = new HashMap<>(); // current balance, per account nr
-    Map<String, Pair<String, BigDecimal>> bufferStorage = new HashMap<>(); // for not finalized transactions
-    Map<String, Pair<String, PaymentStatus>> transactions = new HashMap<>(); //
+    private final Map<String, BigDecimal> accountStorage = new HashMap<>(); // current balance, per account nr
+    private final Map<String, Pair<String, BigDecimal>> bufferStorage = new HashMap<>(); // for not finalized transactions
+    private final Map<String, Pair<String, PaymentStatus>> transactions = new HashMap<>(); //
+
+    public AccountServiceImpl() {
+        initializeAccounts();
+    } // default constructor - for unit tests
+
+    // set initial balance
+    private void initializeAccounts() {
+        accountStorage.put("PL61109010140000071219812874", new BigDecimal(1000L));
+        accountStorage.put("CZ6508000000192000145399", new BigDecimal(0L));
+        accountStorage.put("US122000103040445550000000", new BigDecimal(50000L));
+        accountStorage.put("DE0445999991232449999999", new BigDecimal(0L));
+        accountStorage.put("RU099912012000000031399999999", new BigDecimal(10000000000L));
+        accountStorage.put("BA0090909090339494494949", new BigDecimal(50000L));
+    }
 
     // Block requested amount on the account, by decreasing balance. This is reversible operation
     @Override
@@ -26,7 +40,8 @@ public class AccountServiceImpl implements AccountService {
             return PaymentStatus.DECLINED;
         }
         BigDecimal originBalance = accountStorage.get(source);
-        accountStorage.put(source, originBalance.subtract(amount));
+        originBalance = originBalance.subtract(amount);
+        accountStorage.put(source, originBalance);
 
         transactions.put(txId, Pair.of(source, PaymentStatus.AUTHORIZED)); // store account nr used in transaction
         bufferStorage.put(txId, Pair.of(destination, amount)); // store amount in temporary buffer
@@ -48,7 +63,8 @@ public class AccountServiceImpl implements AccountService {
         bufferStorage.remove(txId);
 
         BigDecimal balance = accountStorage.get(accountNumber);
-        accountStorage.put(accountNumber, balance.add(compensatingAmount));
+        compensatingAmount = balance.add(compensatingAmount);
+        accountStorage.put(accountNumber, compensatingAmount);
 
         return PaymentStatus.CANCELLED;
     }
@@ -61,7 +77,8 @@ public class AccountServiceImpl implements AccountService {
         }
 
         BigDecimal balance = accountStorage.get(accountNumber);
-        accountStorage.put(accountNumber, balance.add(amount));
+        balance = balance.add(amount);
+        accountStorage.put(accountNumber, balance);
 
         return PaymentStatus.COMPLETED;
     }

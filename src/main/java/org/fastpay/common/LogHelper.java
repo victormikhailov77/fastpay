@@ -1,13 +1,13 @@
 package org.fastpay.common;
 
-import org.fastpay.Application;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import spark.Request;
 import spark.Response;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 public class LogHelper {
 
     private LogHelper() {}
@@ -30,7 +30,7 @@ public class LogHelper {
             try {
                 sb.append(" body size in bytes: " + response.body().getBytes(raw.getCharacterEncoding()).length);
             } catch (UnsupportedEncodingException e) {
-                LoggerFactory.getLogger(Application.class).error("Exception during parsing response: ", e);
+                log.error("Exception during parsing response: ", e);
             }
         }
         return sb.toString();

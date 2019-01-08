@@ -20,7 +20,7 @@ public class QueryParameterValidator {
         if (validValues.contains(sortOrder.toLowerCase())) {
             return sortOrder.toLowerCase();
         } else {
-            throw new ParameterValidationException("Invalid value in query parameter 'order'. Accepted values are asc, desc");
+            throw new IllegalArgumentException("Invalid value in query parameter 'order'. Accepted values are asc, desc");
         }
     }
 
@@ -31,7 +31,7 @@ public class QueryParameterValidator {
             try {
                 value = Long.parseLong(numberAsString);
             } catch (NumberFormatException ex) {
-                throw new ParameterValidationException("Invalid numeric value in query parameter 'limit'", ex);
+                throw new IllegalArgumentException("Invalid numeric value in query parameter 'limit'", ex);
             }
         }
 
@@ -45,7 +45,7 @@ public class QueryParameterValidator {
             try {
                 transferStatus = TransferStatus.valueOf(status.toUpperCase());
             } catch (IllegalArgumentException ex) {
-                throw new ParameterValidationException("Invalid value in query parameter 'status'", ex);
+                throw new IllegalArgumentException("Invalid value in query parameter 'status'", ex);
             }
         }
 
@@ -67,7 +67,7 @@ public class QueryParameterValidator {
                 "USD"));
 
         if (!currencies.contains(currencyUpper)) {
-            throw new ParameterValidationException("Invalid value in query parameter 'currency'");
+            throw new IllegalArgumentException("Invalid value in query parameter 'currency'");
         }
 
         return currencyUpper;
@@ -79,7 +79,7 @@ public class QueryParameterValidator {
         try {
             return new BigDecimal(amount);
         } catch (NumberFormatException ex) {
-            throw new ParameterValidationException("Invalid value in query parameter 'amount'");
+            throw new IllegalArgumentException("Invalid value in query parameter 'amount'");
         }
     }
 
@@ -92,7 +92,7 @@ public class QueryParameterValidator {
             final Method method = Transfer.class.getMethod("get" + StringUtils.capitalize(sortPropertyName));
             return (x, y) -> MethodGetWrapper.of(method, x).compareTo(MethodGetWrapper.of(method, y));
         } catch (NoSuchMethodException ex) {
-            throw new ParameterValidationException("Invalid field name in query parameter 'sort'", ex);
+            throw new IllegalArgumentException("Invalid field name in query parameter 'sort'", ex);
         }
     }
 }

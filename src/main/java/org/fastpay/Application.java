@@ -1,12 +1,11 @@
 package org.fastpay;
 
 import com.google.inject.Guice;
+import lombok.extern.slf4j.Slf4j;
 import org.fastpay.app.GuiceModule;
 import org.fastpay.common.LogHelper;
 import org.fastpay.common.RestOperationTemplate;
 import org.fastpay.service.TransferService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -15,9 +14,9 @@ import static spark.Spark.*;
 /**
  * Money transfer REST API implementation
  */
+@Slf4j
 public class Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
     private static final String RESOURCE_URI = "/transfer";
     private static final String RESOURCE_URI_ID = RESOURCE_URI + "/:id";
     private static final String RESOURCE_URI_CLEANUP = "/deleteAllTransfers";
@@ -41,22 +40,22 @@ public class Application {
     void run(final int port) {
         port(port);
 
-        logger.info("Server started");
+        log.info("Server started");
 
         // return newly created transfer with assigned id
         post(RESOURCE_URI, (request, response) ->
-            restTemplate.resourceCreate(request, response, transferService::createTransfer,
+            restTemplate.resourceCreate(request, response,
                     "Transfer successfully created", "Error occured. Transfer not created.")
         );
 
         // return list of all transfers
         get(RESOURCE_URI, (request, response) ->
-            restTemplate.resourceGetAll(request, response, transferService::getTransfers)
+            restTemplate.resourceGetAll(request, response)
         );
 
         // return transfer details
         get(RESOURCE_URI_ID, (request, response) ->
-            restTemplate.resourceGet(request, response, transferService::getTransferDetails,
+            restTemplate.resourceGet(request, response,
                     "Transfer details successfully retrieved", "No transfer with such id found")
         );
 
@@ -75,12 +74,12 @@ public class Application {
         // cleanup database
         // maintenance function, should be not available for users
         delete(RESOURCE_URI_CLEANUP, (request, response) ->
-            restTemplate.resourceCleanup(transferService::cleanup)
+            restTemplate.resourceCleanup()
         );
 
         after((request, response) -> {
-            logger.info(LogHelper.requestToString(request));
-            logger.info(LogHelper.responseToString(response));
+            log.info(LogHelper.requestToString(request));
+            log.info(LogHelper.responseToString(response));
         });
 
     }
