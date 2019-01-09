@@ -92,10 +92,31 @@ public class ApplicationTest extends TestBase {
     }
 
     @Test
-    public void shouldFailOnCreateWithInvalidArgument() {
-        // execute POST create
+    public void shouldFailOnCreateWithInvalidAmount() {
+        // given
+        String createJson = loadFileFromResource("bad_amount.json");
 
-        // validate id
+        // when
+        String jsonResult = submitRequest("POST", "/transfer", createJson);
+        ServiceResponse response = new Gson().fromJson(jsonResult, ServiceResponse.class);
+
+        // then
+        assertEquals(TransferStatus.ERROR, response.getStatus());
+        assertEquals("Error occured. Transfer not created.", response.getMessage());
+    }
+
+    @Test
+    public void shouldFailOnCreateWithInvalidCurrency() {
+        // given
+        String createJson = loadFileFromResource("bad_currency.json");
+
+        // when
+        String jsonResult = submitRequest("POST", "/transfer", createJson);
+        ServiceResponse response = new Gson().fromJson(jsonResult, ServiceResponse.class);
+
+        // then
+        assertEquals(TransferStatus.ERROR, response.getStatus());
+        assertEquals("Error occured. Transfer not created.", response.getMessage());
     }
 
     @Test

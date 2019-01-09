@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.fastpay.common.QueryParameterValidator.getCurrency;
 import static org.fastpay.common.QueryParameterValidator.getSortComparator;
 
 // Super-lightweight in-memory NoSQL database, backed by key-value map
@@ -29,7 +30,7 @@ public class TransferRepositoryImpl implements TransferRepository {
         newTransfer.setSource(transferData.getSource());
         newTransfer.setDestination(transferData.getDestination());
         newTransfer.setAmount(transferData.getAmount());
-        newTransfer.setCurrency(transferData.getCurrency());
+        newTransfer.setCurrency(getCurrency(transferData.getCurrency()));
         newTransfer.setTitle(transferData.getTitle());
         transferStore.put(newTransfer.getId(), newTransfer);
         return newTransfer;
