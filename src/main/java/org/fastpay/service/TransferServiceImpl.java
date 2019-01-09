@@ -59,18 +59,16 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public TransferStatus cancelTransfer(String txId) {
         Transfer transfer = getTransferDetails(txId);
-        if (transfer != null) {
-            if (transfer.getStatus().equals(TransferStatus.PENDING)) {
+        if (transfer != null && transfer.getStatus().equals(TransferStatus.PENDING)) {
 
-                // if payment authorized, but not sent to the recipient,
-                // its possible to cancel payment and revert transaction
-                // account balance will be restored to previous state
-                PaymentStatus status = senderAccountService.cancelPayment(txId);
-                if (status.equals(PaymentStatus.CANCELLED)) {
-                    transfer.setStatus(TransferStatus.CANCELLED);
-                    repository.update(txId, transfer);
-                    return TransferStatus.CANCELLED;
-                }
+            // if payment authorized, but not sent to the recipient,
+            // its possible to cancel payment and revert transaction
+            // account balance will be restored to previous state
+            PaymentStatus status = senderAccountService.cancelPayment(txId);
+            if (status.equals(PaymentStatus.CANCELLED)) {
+                transfer.setStatus(TransferStatus.CANCELLED);
+                repository.update(txId, transfer);
+                return TransferStatus.CANCELLED;
             }
         }
         return TransferStatus.ERROR;
@@ -80,25 +78,22 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public TransferStatus executeTransfer(String txId) {
         Transfer transfer = getTransferDetails(txId);
-        if (transfer != null) {
-            if (transfer.getStatus().equals(TransferStatus.PENDING)) {
+        if (transfer != null && transfer.getStatus().equals(TransferStatus.PENDING)) {
+            // deposit money to recipient account
+            PaymentStatus status = recipientAccountService.deposit(transfer.getDestination(), transfer.getAmount(),
+                    transfer.getCurrency(), transfer.getId());
 
-                // deposit money to recipient account
-                PaymentStatus status = recipientAccountService.deposit(transfer.getDestination(), transfer.getAmount(),
-                        transfer.getCurrency(), transfer.getId());
-
-                if (status.equals(PaymentStatus.COMPLETED)) {
-                    PaymentStatus senderStatus = senderAccountService.finalizePayment(transfer.getId());
-                    if (senderStatus.equals(PaymentStatus.COMPLETED)) {
-                        transfer.setStatus(TransferStatus.COMPLETED);
-                        repository.update(txId, transfer);
-                        return TransferStatus.COMPLETED;
-                    } else {
-                        // still authorized/pending
-                        return TransferStatus.PENDING;
-                    }
-
+            if (status.equals(PaymentStatus.COMPLETED)) {
+                PaymentStatus senderStatus = senderAccountService.finalizePayment(transfer.getId());
+                if (senderStatus.equals(PaymentStatus.COMPLETED)) {
+                    transfer.setStatus(TransferStatus.COMPLETED);
+                    repository.update(txId, transfer);
+                    return TransferStatus.COMPLETED;
+                } else {
+                    // still authorized/pending
+                    return TransferStatus.PENDING;
                 }
+
             }
         }
         return TransferStatus.ERROR;
