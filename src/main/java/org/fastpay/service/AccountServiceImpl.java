@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // Operations on banking account
 // in real life scenario, should be wrapper around bank API
@@ -53,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public PaymentStatus cancelPayment(String txId) {
         Pair<String, PaymentStatus> pair = transactions.get(txId);
-        PaymentStatus status = pair.getValue();
+        PaymentStatus status = Optional.ofNullable(pair).map(Pair::getValue).orElse(PaymentStatus.ERROR);
         if (!status.equals(PaymentStatus.AUTHORIZED)) {
             return PaymentStatus.ERROR; // wrong state
         }
@@ -86,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public PaymentStatus finalizePayment(String txId) {
         Pair<String, PaymentStatus> pair = transactions.get(txId);
-        PaymentStatus status = pair.getValue();
+        PaymentStatus status = Optional.ofNullable(pair).map(Pair::getValue).orElse(PaymentStatus.ERROR);
         if (!status.equals(PaymentStatus.AUTHORIZED)) {
             return PaymentStatus.ERROR; // must be authorized first
         }
