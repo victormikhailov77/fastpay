@@ -36,7 +36,7 @@ public class AccountServiceImpl implements AccountService {
             return PaymentStatus.INVALID_ACCOUNT; // account locked or not exist
         }
 
-        if (balance(source, currency).compareTo(amount) == 0) {
+        if (balance(source, currency).compareTo(amount) == -1) {
             // insufficient funds
             return PaymentStatus.DECLINED;
         }
